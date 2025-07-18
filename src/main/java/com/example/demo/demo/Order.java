@@ -10,14 +10,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "orders") // optional
+@Table(name = "orders")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate orderDate; // ✅ Required for setOrderDate(LocalDate)
+    private LocalDate orderDate;
 
     @ManyToOne
     private User user;

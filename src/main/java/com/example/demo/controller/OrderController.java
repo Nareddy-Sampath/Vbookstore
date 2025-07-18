@@ -1,10 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.demo.Order;
-import com.example.demo.demo.OrderItem;
-import com.example.demo.demo.User;
+import com.example.demo.dto.OrderRequest;
 import com.example.demo.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,20 +13,20 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
-    @PostMapping("/place")
-    public Order placeOrder(@RequestBody Order order) {
-        User user = order.getUser();
-        List<OrderItem> items = order.getItems();
-        return orderService.placeOrder(user, items);
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
-    @GetMapping("/user/{userId}")
-    public List<Order> getOrders(@PathVariable Long userId) {
-        User user = new User();
-        user.setId(userId);
-        return orderService.getOrdersByUser(user);
+    @PostMapping("/place")
+    public Order placeOrder(@RequestBody OrderRequest request,
+                            @AuthenticationPrincipal UserDetails userDetails) {
+        return orderService.placeOrder(userDetails.getUsername(), request.getBookIds());
+    }
+
+    @GetMapping("/my")
+    public List<Order> getUserOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        return orderService.getOrdersByUsername(userDetails.getUsername());
     }
 }
